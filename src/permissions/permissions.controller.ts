@@ -40,8 +40,8 @@ export class PermissionsController {
 
     @Get()
     @ApiOperation({})
-    // @UseGuards(AuthGuard('jwt'), RolesGuard)
-    // @Roles(SUPER_ADMIN)
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(SUPER_ADMIN)
     async getAll(@Res() res: Response) {
         try {
             const permissions = await this.permissionsService.getAll();
@@ -65,8 +65,8 @@ export class PermissionsController {
 
     @Get(':profileId')
     @ApiOperation({})
-    // @UseGuards(AuthGuard('jwt'), RolesGuard)
-    // @Roles(SUPER_ADMIN)
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(SUPER_ADMIN)
     async getMenusAndPermissionByProfile(@Res() res: Response, @Param('profileId')profileId: number ) {
         try {
             const data = await this.permissionsService.getMenusAndPermissionByProfile(profileId);
