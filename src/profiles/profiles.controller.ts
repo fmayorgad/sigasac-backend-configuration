@@ -28,28 +28,27 @@ import {
     Roles,
     RolesGuard
 } from 'sigasac-utils';
+import { ProfilesService } from './profiles.service';
+import { ProfileDto, ChangeStateDto } from './dto';
 const { SUPER_ADMIN } = ROLES;
 
-import { MenusService } from './menus.service';
-import { MenuDto, ChangeStateDto } from './dto';
-
-@Controller(`${CONFIGURATION.apiBasePath}/${CONFIGURATION.subRoutes.menus}`)
-@ApiTags(`${CONFIGURATION.subRoutes.menus}`)
+@Controller(`${CONFIGURATION.apiBasePath}/${CONFIGURATION.subRoutes.profiles}`)
+@ApiTags(`${CONFIGURATION.subRoutes.profiles}`)
 @ApiBearerAuth()
-export class MenusController {
-    constructor(private readonly menusService: MenusService) {}
+export class ProfilesController {
+    constructor(private readonly profilesService: ProfilesService) {}
 
     @Post()
     @ApiConsumes('application/x-www-form-urlencoded')
     @ApiOperation({})
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(SUPER_ADMIN)
-    async create(@Res() res: Response, @Body() menuDto: MenuDto) {
+    async create(@Res() res: Response, @Body() profileDto: ProfileDto) {
         try {
-            const menu = await this.menusService.create(menuDto);
+            const profile = await this.profilesService.create(profileDto);
 
             res.status(HttpStatus.CREATED).send({
-                menu
+                profile
             });
         } catch (error) {
             if (error.message.statusCode) {
@@ -71,10 +70,10 @@ export class MenusController {
     @Roles(SUPER_ADMIN)
     async getAll(@Res() res: Response) {
         try {
-            const menus = await this.menusService.getAll();
+            const profiles = await this.profilesService.getAll();
 
             res.status(HttpStatus.OK).send({
-                menus
+                profiles
             });
         } catch (error) {
             if (error.message.statusCode) {
@@ -90,45 +89,18 @@ export class MenusController {
         }
     }
 
-    @Get(':father/submenus')
-    @ApiOperation({})
-    @UseGuards(AuthGuard('jwt'), RolesGuard)
-    @Roles(SUPER_ADMIN)
-    async getSubmenus(@Res() res: Response, @Param('father') father: number) {
-        try {
-            const submenus = await this.menusService.getSubmenusByFather(
-                father
-            );
-
-            res.status(HttpStatus.OK).send({
-                submenus
-            });
-        } catch (error) {
-            if (error.message.statusCode) {
-                return res.status(error.message.statusCode).send({
-                    message: error.message
-                });
-            }
-
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
-                message: error.message,
-                stack: error.stack
-            });
-        }
-    }
-
-    @Put(':menuId')
+    @Put(':profileId')
     @ApiConsumes('application/x-www-form-urlencoded')
     @ApiOperation({})
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(SUPER_ADMIN)
     async update(
         @Res() res: Response,
-        @Param('menuId') menuId: number,
-        @Body() menuDto: MenuDto
+        @Param('profileId') profileId: number,
+        @Body() profileDto: ProfileDto
     ) {
         try {
-            await this.menusService.update(menuId, menuDto);
+            await this.profilesService.update(profileId, profileDto);
 
             res.status(HttpStatus.NO_CONTENT).send({
                 response: 'Actualización exitosa!'
@@ -147,18 +119,21 @@ export class MenusController {
         }
     }
 
-    @Patch(':menuId')
+    @Patch(':profileId')
     @ApiOperation({})
     @ApiConsumes('application/x-www-form-urlencoded')
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(SUPER_ADMIN)
     async changeState(
         @Res() res: Response,
-        @Param('menuId') menuId: number,
+        @Param('profileId') profileId: number,
         @Body() changeStateDto: ChangeStateDto
     ) {
         try {
-            await this.menusService.changeState(menuId, changeStateDto.state);
+            await this.profilesService.changeState(
+                profileId,
+                changeStateDto.state
+            );
 
             res.status(HttpStatus.NO_CONTENT).send({
                 response: 'Cambio de estado exitoso!'
