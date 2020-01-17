@@ -2,12 +2,11 @@ import { Module } from '@nestjs/common';
 
 import { AuthModule } from 'sigasac-utils';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { MenusModule } from "./menus/menus.module";
 
 @Module({
-    imports: [AuthModule],
-    controllers: [AppController],
-    providers: [AppService]
+    imports: [AuthModule, MenusModule],
+    controllers: [],
+    providers: []
 })
 export class AppModule {}
