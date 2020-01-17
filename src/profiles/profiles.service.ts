@@ -19,7 +19,11 @@ export class ProfilesService {
         try {
             const connection = await DatabaseProvider.getConnection();
 
-            return await connection.getRepository(Profile).find();
+            return await connection.getRepository(Profile).find({
+                order: {
+                    id: 'ASC'
+                }
+            });
         } catch (error) {
             throw error;
         }
