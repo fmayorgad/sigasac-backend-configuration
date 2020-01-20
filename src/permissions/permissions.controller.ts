@@ -9,16 +9,18 @@ import {
     Get,
     Query,
     Patch,
-    UseGuards
+    UseGuards,
+    Logger
 } from '@nestjs/common';
 
 import { Response } from 'express';
 
 import {
-    ApiTags,
+    ApiBearerAuth,
+    ApiBody,
     ApiConsumes,
     ApiOperation,
-    ApiBearerAuth
+    ApiTags
 } from '@nestjs/swagger';
 
 import {
@@ -29,10 +31,13 @@ import {
     RolesGuard
 } from 'sigasac-utils';
 import { PermissionsService } from './permissions.service';
+import { MenuPermissionProfileDto, MenusPermissionsProfileDto } from './dto';
 
 const { SUPER_ADMIN } = ROLES;
 
-@Controller(`${CONFIGURATION.apiBasePath}/${CONFIGURATION.subRoutes.permissions}`)
+@Controller(
+    `${CONFIGURATION.apiBasePath}/${CONFIGURATION.subRoutes.permissions}`
+)
 @ApiTags(`${CONFIGURATION.subRoutes.permissions}`)
 @ApiBearerAuth()
 export class PermissionsController {
@@ -67,11 +72,50 @@ export class PermissionsController {
     @ApiOperation({})
     @UseGuards(AuthGuard('jwt'), RolesGuard)
     @Roles(SUPER_ADMIN)
-    async getMenusAndPermissionByProfile(@Res() res: Response, @Param('profileId')profileId: number ) {
+    async getMenusAndPermissionByProfile(
+        @Res() res: Response,
+        @Param('profileId') profileId: number
+    ) {
         try {
-            const data = await this.permissionsService.getMenusAndPermissionByProfile(profileId);
+            const data = await this.permissionsService.getMenusAndPermissionByProfile(
+                profileId
+            );
 
             res.status(HttpStatus.OK).send({
+                data
+            });
+        } catch (error) {
+            if (error.message.statusCode) {
+                return res.status(error.message.statusCode).send({
+                    message: error.message
+                });
+            }
+
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
+                message: error.message,
+                stack: error.stack
+            });
+        }
+    }
+
+    @Post(':profileId')
+    @ApiOperation({})
+    @ApiConsumes('application/json')
+    @ApiBody({ type: MenusPermissionsProfileDto })
+    // @UseGuards(AuthGuard('jwt'), RolesGuard)
+    // @Roles(SUPER_ADMIN)
+    async deleteAndSave(
+        @Res() res: Response,
+        @Param('profileId') profileId: number,
+        @Body() menusPermissionsProfile: MenusPermissionsProfileDto
+    ) {
+        try {
+            const data = await this.permissionsService.deleteAndSave(
+                profileId,
+                menusPermissionsProfile.data
+            );
+
+            res.status(HttpStatus.CREATED).send({
                 data
             });
         } catch (error) {
