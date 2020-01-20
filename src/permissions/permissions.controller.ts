@@ -102,8 +102,8 @@ export class PermissionsController {
     @ApiOperation({})
     @ApiConsumes('application/json')
     @ApiBody({ type: MenusPermissionsProfileDto })
-    // @UseGuards(AuthGuard('jwt'), RolesGuard)
-    // @Roles(SUPER_ADMIN)
+    @UseGuards(AuthGuard('jwt'), RolesGuard)
+    @Roles(SUPER_ADMIN)
     async deleteAndSave(
         @Res() res: Response,
         @Param('profileId') profileId: number,
