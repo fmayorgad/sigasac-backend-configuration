@@ -17,4 +17,4 @@ RUN npm install && npm run build
 
 EXPOSE 3002
 
-CMD ["pm2-runtime", "/opt/sigasac/configurations/dist/main.js"]
+CMD ["pm2-dev", "/opt/sigasac/configurations/dist/main.js"]
